@@ -1,6 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const { createLaporanPDF } = require('../utils/laporangenerator');
+const { createLaporanPDF } = require('../utils/laporanGenerator');
 
 // Tampilkan form tambah menu
 const renderTambahMenu = (req, res) => {
