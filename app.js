@@ -77,8 +77,12 @@ app.use((err, req, res, next) => {
   res.render('error');
 });
 
-app.listen(port, () => {
-  console.log(`Server berjalan di http://localhost:${port}`);
+// app.listen(port, () => {
+//   console.log(`Server berjalan di http://localhost:${port}`);
+// });
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server berjalan di port ${PORT}`);
 });
 
 module.exports = app;
