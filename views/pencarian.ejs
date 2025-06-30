@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pencarian Menu - SIRASO BC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="min-h-screen flex flex-col font-sans">
+
+  <!-- Header -->
+  <%- include('partials/header') %>
+
+  <main class="flex-1">
+    <!-- Filter Section -->
+    <div class="bg-white shadow-md p-6 mb-6">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">🔍 Pencarian & Filter Menu</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Search Keyword -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Cari Menu</label>
+            <div class="relative">
+              <input type="text" id="keyword" placeholder="Nama menu, deskripsi, atau bahan..." 
+                     class="w-full px-3 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+              <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+            </div>
+          </div>
+
+          <!-- Kategori Filter -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+            <select id="kategori" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+              <option value="">Semua Kategori</option>
+              <option value="Nasi">🍚 Nasi</option>
+              <option value="Mie">🍜 Mie</option>
+              <option value="Minuman">🥤 Minuman</option>
+              <option value="Camilan">🍿 Camilan</option>
+              <option value="Dessert">🍰 Dessert</option>
+            </select>
+          </div>
+
+          <!-- Harga Range -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Rentang Harga</label>
+            <div class="flex gap-2">
+              <input type="number" id="minHarga" placeholder="Min" 
+                     class="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+              <input type="number" id="maxHarga" placeholder="Max" 
+                     class="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+          </div>
+
+          <!-- Sort By -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Urutkan</label>
+            <select id="sortBy" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+              <option value="nama_makanan">📝 Nama A-Z</option>
+              <option value="harga">💰 Harga Terendah</option>
+              <option value="harga_desc">💰 Harga Tertinggi</option>
+              <option value="rating">⭐ Rating Tertinggi</option>
+              <option value="popularitas">🔥 Paling Populer</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="flex flex-wrap gap-4 mt-4">
+          <button onclick="applyFilters()" class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition flex items-center">
+            <i class="fas fa-search mr-2"></i>Terapkan Filter
+          </button>
+          <button onclick="resetFilters()" class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 transition flex items-center">
+            <i class="fas fa-undo mr-2"></i>Reset
+          </button>
+          <button onclick="loadMenuPopuler()" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition flex items-center">
+            <i class="fas fa-fire mr-2"></i>Menu Populer
+          </button>
+          <button onclick="loadMenuRating()" class="bg-yellow-600 text-white px-6 py-2 rounded-md hover:bg-yellow-700 transition flex items-center">
+            <i class="fas fa-star mr-2"></i>Rating Tinggi
+          </button>
+          <button onclick="showDownloadMenu()" class="bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700 transition flex items-center">
+            <i class="fas fa-download mr-2"></i>Download Menu
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="max-w-6xl mx-auto px-4">
+      <div id="loading" class="hidden text-center py-8">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700 mx-auto"></div>
+        <p class="mt-4 text-gray-600">🔍 Mencari menu...</p>
+      </div>
+
+      <div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Results will be loaded here -->
+      </div>
+
+      <div id="noResults" class="hidden text-center py-8">
+        <i class="fas fa-search text-4xl text-gray-400 mb-4"></i>
+        <p class="text-gray-600">Tidak ada menu yang ditemukan</p>
+        <p class="text-sm text-gray-500 mt-2">Coba ubah filter pencarian Anda</p>
+      </div>
+
+      <div id="error" class="hidden text-center py-8">
+        <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+        <p class="text-red-600">Terjadi kesalahan saat memuat data</p>
+        <button onclick="loadMenu()" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
+          Coba Lagi
+        </button>
+      </div>
+    </div>
+
+    <!-- Download Menu Modal -->
+    <div id="downloadModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+          <div class="flex justify-between items-center p-6 border-b">
+            <h3 class="text-xl font-semibold text-gray-800">📥 Download Menu per Warung</h3>
+            <button onclick="hideDownloadMenu()" class="text-gray-400 hover:text-gray-600">
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          
+          <div class="p-6">
+            <div id="downloadLoading" class="hidden text-center py-8">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700 mx-auto"></div>
+              <p class="mt-4 text-gray-600">Memuat daftar warung...</p>
+            </div>
+            
+            <div id="downloadContent" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <!-- Warung list will be loaded here -->
+            </div>
+            
+            <div id="downloadNoData" class="hidden text-center py-8">
+              <i class="fas fa-store text-4xl text-gray-400 mb-4"></i>
+              <p class="text-gray-600">Tidak ada warung yang tersedia</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+
+  <script>
+    let currentFilters = {};
+    let searchTimeout;
+
+    function applyFilters() {
+      const filters = {
+        keyword: document.getElementById('keyword').value,
+        kategori: document.getElementById('kategori').value,
+        minHarga: document.getElementById('minHarga').value,
+        maxHarga: document.getElementById('maxHarga').value,
+        sortBy: document.getElementById('sortBy').value
+      };
+
+      currentFilters = filters;
+      loadMenu(filters);
+    }
+
+    function resetFilters() {
+      document.getElementById('keyword').value = '';
+      document.getElementById('kategori').value = '';
+      document.getElementById('minHarga').value = '';
+      document.getElementById('maxHarga').value = '';
+      document.getElementById('sortBy').value = 'nama_makanan';
+      
+      currentFilters = {};
+      loadMenu({});
+    }
+
+    function loadMenu(filters = {}) {
+      showLoading();
+      hideError();
+      
+      const params = new URLSearchParams();
+      Object.keys(filters).forEach(key => {
+        if (filters[key]) {
+          params.append(key, filters[key]);
+        }
+      });
+
+      fetch(`/menu?${params.toString()}`)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return res.json();
+        })
+        .then(data => {
+          hideLoading();
+          if (data.success) {
+            displayResults(data.data);
+          } else {
+            showNoResults();
+          }
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          hideLoading();
+          showError();
+        });
+    }
+
+    function loadMenuPopuler() {
+      showLoading();
+      hideError();
+      fetch('/menu/populer')
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return res.json();
+        })
+        .then(data => {
+          hideLoading();
+          if (data.success) {
+            displayResults(data.data);
+          } else {
+            showNoResults();
+          }
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          hideLoading();
+          showError();
+        });
+    }
+
+    function loadMenuRating() {
+      showLoading();
+      hideError();
+      fetch('/menu/rating?minRating=4')
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return res.json();
+        })
+        .then(data => {
+          hideLoading();
+          if (data.success) {
+            displayResults(data.data);
+          } else {
+            showNoResults();
+          }
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          hideLoading();
+          showError();
+        });
+    }
+
+    function displayResults(menu) {
+      const resultsDiv = document.getElementById('results');
+      const noResultsDiv = document.getElementById('noResults');
+
+      if (menu.length === 0) {
+        resultsDiv.innerHTML = '';
+        showNoResults();
+        return;
+      }
+
+      hideNoResults();
+      
+      const menuHtml = menu.map(item => {
+        // Hitung rating rata-rata jika tidak ada
+        let ratingAvg = item.rating_avg;
+        let reviewCount = item.review_count;
+        
+        if (!ratingAvg && item.review) {
+          const totalRating = item.review.reduce((sum, review) => sum + review.rating, 0);
+          ratingAvg = item.review.length > 0 ? totalRating / item.review.length : 0;
+          reviewCount = item.review.length;
+        }
+        
+        return `
+          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition transform hover:scale-105">
+            <div class="relative">
+              <img src="${item.gambar_url || '/images/default-food.jpg'}" alt="${item.nama_makanan}" 
+                   class="w-full h-48 object-cover">
+              ${item.stok <= 5 ? `<div class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs">Stok Terbatas</div>` : ''}
+            </div>
+            <div class="p-4">
+              <h3 class="text-lg font-semibold text-gray-800 mb-2">${item.nama_makanan}</h3>
+              <p class="text-gray-600 text-sm mb-2 line-clamp-2">${item.deskripsi || 'Tidak ada deskripsi'}</p>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-green-600 font-bold">Rp ${item.harga.toLocaleString('id-ID')}</span>
+                <div class="flex items-center">
+                  <i class="fas fa-star text-yellow-400 mr-1"></i>
+                  <span class="text-sm text-gray-600">${ratingAvg ? ratingAvg.toFixed(1) : '0.0'}</span>
+                  <span class="text-xs text-gray-500 ml-1">(${reviewCount || 0})</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-gray-500">Stok: ${item.stok}</span>
+                <button onclick="addToCart(${item.menu_id})" 
+                        class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition flex items-center"
+                        ${item.stok <= 0 ? 'disabled' : ''}>
+                  <i class="fas fa-plus mr-1"></i>${item.stok <= 0 ? 'Habis' : 'Tambah'}
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      resultsDiv.innerHTML = menuHtml;
+    }
+
+    function addToCart(menuId) {
+      if (!confirm('Tambah ke keranjang?')) return;
+
+      fetch('/keranjang/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ menu_id: menuId, jumlah: 1 })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('✅ Menu berhasil ditambahkan ke keranjang!');
+        } else {
+          alert('❌ Gagal menambahkan menu: ' + data.message);
+        }
+      })
+      .catch(err => {
+        console.error('Error:', err);
+        alert('❌ Terjadi kesalahan saat menambahkan ke keranjang');
+      });
+    }
+
+    function showLoading() {
+      document.getElementById('loading').classList.remove('hidden');
+      document.getElementById('results').classList.add('hidden');
+      document.getElementById('noResults').classList.add('hidden');
+      document.getElementById('error').classList.add('hidden');
+    }
+
+    function hideLoading() {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('results').classList.remove('hidden');
+    }
+
+    function showNoResults() {
+      document.getElementById('noResults').classList.remove('hidden');
+      document.getElementById('results').innerHTML = '';
+      document.getElementById('error').classList.add('hidden');
+    }
+
+    function hideNoResults() {
+      document.getElementById('noResults').classList.add('hidden');
+    }
+
+    function showError() {
+      document.getElementById('error').classList.remove('hidden');
+      document.getElementById('results').innerHTML = '';
+      document.getElementById('noResults').classList.add('hidden');
+    }
+
+    function hideError() {
+      document.getElementById('error').classList.add('hidden');
+    }
+
+    // Load menu on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadMenu();
+    });
+
+    // Search on Enter key
+    document.getElementById('keyword').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        applyFilters();
+      }
+    });
+
+    // Real-time search with debounce
+    document.getElementById('keyword').addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        applyFilters();
+      }, 300);
+    });
+
+    // Auto-apply filters when other inputs change
+    document.getElementById('kategori').addEventListener('change', applyFilters);
+    document.getElementById('sortBy').addEventListener('change', applyFilters);
+    
+    // Debounced price filter
+    document.getElementById('minHarga').addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(applyFilters, 500);
+    });
+    
+    document.getElementById('maxHarga').addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(applyFilters, 500);
+    });
+
+    // Download Menu Functions
+    function showDownloadMenu() {
+      document.getElementById('downloadModal').classList.remove('hidden');
+      loadDaftarWarung();
+    }
+
+    function hideDownloadMenu() {
+      document.getElementById('downloadModal').classList.add('hidden');
+    }
+
+    function loadDaftarWarung() {
+      showDownloadLoading();
+      
+      fetch('/menu/warung')
+        .then(res => res.json())
+        .then(data => {
+          hideDownloadLoading();
+          if (data.success && data.data.length > 0) {
+            displayWarungList(data.data);
+          } else {
+            showDownloadNoData();
+          }
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          hideDownloadLoading();
+          showDownloadNoData();
+        });
+    }
+
+    function displayWarungList(warung) {
+      const contentDiv = document.getElementById('downloadContent');
+      hideDownloadNoData();
+      
+      const warungHtml = warung.map(item => `
+        <div class="bg-gradient-to-b from-green-100 to-white rounded-xl shadow-md p-4 flex flex-col justify-between items-center">
+          <div class="w-full h-24 rounded-lg bg-gradient-to-b from-green-200 to-white mb-4 flex items-center justify-center">
+            <i class="fas fa-store text-3xl text-green-600"></i>
+          </div>
+          <h4 class="text-lg font-semibold text-gray-800 mb-2 text-center">${item.nama_toko}</h4>
+          <p class="text-sm text-gray-600 mb-3 text-center">${item.alamat}</p>
+          <p class="text-xs text-gray-500 mb-4">${item.menu.length} menu tersedia</p>
+          <button onclick="downloadMenuPDF(${item.toko_id}, '${item.nama_toko}')" 
+                  class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-full shadow transition flex items-center">
+            <i class="fas fa-download mr-2"></i>Download Menu
+          </button>
+        </div>
+      `).join('');
+      
+      contentDiv.innerHTML = warungHtml;
+    }
+
+    function downloadMenuPDF(tokoId, namaToko) {
+      // Tampilkan loading
+      const button = event.target;
+      const originalText = button.innerHTML;
+      button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Membuat PDF...';
+      button.disabled = true;
+      
+      // Download PDF
+      const link = document.createElement('a');
+      link.href = `/menu/pdf/${tokoId}`;
+      link.download = `menu_${namaToko.replace(/\s+/g, '_')}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Reset button setelah 2 detik
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+      }, 2000);
+    }
+
+    function showDownloadLoading() {
+      document.getElementById('downloadLoading').classList.remove('hidden');
+      document.getElementById('downloadContent').classList.add('hidden');
+      document.getElementById('downloadNoData').classList.add('hidden');
+    }
+
+    function hideDownloadLoading() {
+      document.getElementById('downloadLoading').classList.add('hidden');
+      document.getElementById('downloadContent').classList.remove('hidden');
+    }
+
+    function showDownloadNoData() {
+      document.getElementById('downloadNoData').classList.remove('hidden');
+      document.getElementById('downloadContent').classList.add('hidden');
+    }
+
+    function hideDownloadNoData() {
+      document.getElementById('downloadNoData').classList.add('hidden');
+    }
+  </script>
+
+</body>
+</html>

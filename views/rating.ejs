@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pencarian Makanan UNAND</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <%- include('partials/headersearch') %>
+
+  <!-- Konten -->
+  <main class="mx-8 my-6 space-y-8">
+
+    <!-- Rating -->
+    <div id="tab-rating" class="tab-content bg-white shadow rounded-md p-6">
+      <h2 class="font-semibold text-lg mb-4">Makanan dengan Rating Tertinggi</h2>
+      
+      <!-- Filter Rating -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Filter Rating Minimum:</label>
+        <select id="ratingFilter" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+          <option value="0">Semua Rating</option>
+          <option value="4" selected>4+ Bintang</option>
+          <option value="4.5">4.5+ Bintang</option>
+          <option value="5">5 Bintang</option>
+        </select>
+        <button onclick="loadMenuByRating()" class="ml-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
+          Terapkan Filter
+        </button>
+      </div>
+
+      <!-- Loading -->
+      <div id="loading" class="hidden text-center py-8">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700 mx-auto"></div>
+        <p class="mt-4 text-gray-600">Memuat menu...</p>
+      </div>
+
+      <!-- Results -->
+      <div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Results will be loaded here -->
+      </div>
+
+      <!-- No Results -->
+      <div id="noResults" class="hidden text-center py-8">
+        <i class="fas fa-star text-4xl text-gray-400 mb-4"></i>
+        <p class="text-gray-600">Tidak ada menu yang ditemukan dengan rating tersebut</p>
+      </div>
+    </div>
+
+    <!-- JS Tab Switcher -->
+    <script>
+      function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+        document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+        document.querySelectorAll('.tab-button').forEach(btn => {
+          btn.classList.remove('bg-green-700', 'text-white');
+          btn.classList.add('bg-white', 'text-black');
+        });
+
+        event.target.classList.add('bg-green-700', 'text-white');
+        event.target.classList.remove('bg-white', 'text-black');
+      }
+
+      function loadMenuByRating() {
+        const minRating = document.getElementById('ratingFilter').value;
+        showLoading();
+        
+        fetch(`/menu/rating?minRating=${minRating}`)
+          .then(res => res.json())
+          .then(data => {
+            hideLoading();
+            if (data.success && data.data.length > 0) {
+              displayResults(data.data);
+            } else {
+              showNoResults();
+            }
+          })
+          .catch(err => {
+            console.error('Error:', err);
+            hideLoading();
+            showNoResults();
+          });
+      }
+
+      function displayResults(menu) {
+        const resultsDiv = document.getElementById('results');
+        const noResultsDiv = document.getElementById('noResults');
+
+        if (menu.length === 0) {
+          resultsDiv.innerHTML = '';
+          showNoResults();
+          return;
+        }
+
+        hideNoResults();
+        
+        const menuHtml = menu.map(item => `
+          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition transform hover:scale-105">
+            <div class="relative">
+              <img src="${item.gambar_url || '/images/default-food.jpg'}" alt="${item.nama_makanan}" 
+                   class="w-full h-48 object-cover">
+              ${item.stok <= 5 ? `<div class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs">Stok Terbatas</div>` : ''}
+            </div>
+            <div class="p-4">
+              <h3 class="text-lg font-semibold text-gray-800 mb-2">${item.nama_makanan}</h3>
+              <p class="text-gray-600 text-sm mb-2 line-clamp-2">${item.deskripsi || 'Tidak ada deskripsi'}</p>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-green-600 font-bold">Rp ${item.harga.toLocaleString('id-ID')}</span>
+                <div class="flex items-center">
+                  <i class="fas fa-star text-yellow-400 mr-1"></i>
+                  <span class="text-sm text-gray-600">${item.rating_avg ? item.rating_avg.toFixed(1) : '0.0'}</span>
+                  <span class="text-xs text-gray-500 ml-1">(${item.review_count || 0})</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-gray-500">Stok: ${item.stok}</span>
+                <button onclick="addToCart(${item.menu_id})" 
+                        class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition flex items-center"
+                        ${item.stok <= 0 ? 'disabled' : ''}>
+                  <i class="fas fa-plus mr-1"></i>${item.stok <= 0 ? 'Habis' : 'Tambah'}
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        resultsDiv.innerHTML = menuHtml;
+      }
+
+      function addToCart(menuId) {
+        if (!confirm('Tambah ke keranjang?')) return;
+
+        fetch('/keranjang/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ menu_id: menuId, jumlah: 1 })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert('✅ Menu berhasil ditambahkan ke keranjang!');
+          } else {
+            alert('❌ Gagal menambahkan menu: ' + data.message);
+          }
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          alert('❌ Terjadi kesalahan saat menambahkan ke keranjang');
+        });
+      }
+
+      function showLoading() {
+        document.getElementById('loading').classList.remove('hidden');
+        document.getElementById('results').classList.add('hidden');
+        document.getElementById('noResults').classList.add('hidden');
+      }
+
+      function hideLoading() {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('results').classList.remove('hidden');
+      }
+
+      function showNoResults() {
+        document.getElementById('noResults').classList.remove('hidden');
+      }
+
+      function hideNoResults() {
+        document.getElementById('noResults').classList.add('hidden');
+      }
+
+      // Load menu on page load
+      document.addEventListener('DOMContentLoaded', () => {
+        loadMenuByRating();
+      });
+    </script>
+  </main>
+</body>
+</html>

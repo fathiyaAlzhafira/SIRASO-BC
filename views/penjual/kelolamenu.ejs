@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kelola Menu - Penjual</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="flex min-h-screen bg-white">
+
+  <!-- Sidebar -->
+  <%- include('../partials/sidebarpenjual', { activePage: 'kelolamenu' }) %>
+
+  <!-- Main Content -->
+  <main class="w-4/5 p-6 bg-gradient-to-b from-green-100 to-white rounded-l-3xl">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-3xl font-semibold text-green-900 bg-green-700 text-white px-6 py-2 rounded-full">Kelola Menu</h2>
+      <a href="/penjual/tambahmenu" class="bg-green-700 text-white px-4 py-2 rounded-full hover:bg-green-800">Tambah Menu</a>
+    </div>
+
+    <script>
+      function editMenu(id) {
+        alert('Edit menu dengan ID: ' + id);
+      }
+
+      function hapusMenu(id) {
+        if (confirm('Yakin ingin menghapus menu ini?')) {
+          alert('Menghapus menu dengan ID: ' + id);
+        }
+      }
+    </script>
+
+    <!-- Statistik -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-green-200 text-center rounded-2xl py-6">
+        <p class="text-lg">Total Menu</p>
+        <p class="text-2xl font-bold"><%= menu.length %></p>
+      </div>
+      <div class="bg-green-200 text-center rounded-2xl py-6">
+        <p class="text-lg">Menu Tersedia</p>
+        <p class="text-2xl font-bold"><%= menu.filter(m => m.stok > 0).length %></p>
+      </div>
+      <div class="bg-green-200 text-center rounded-2xl py-6">
+        <p class="text-lg">Stok Habis</p>
+        <p class="text-2xl font-bold"><%= menu.filter(m => m.stok === 0).length %></p>
+      </div>
+    </div>
+
+    <!-- Tabel Menu -->
+    <div class="bg-white rounded-2xl shadow overflow-x-auto">
+      <table class="w-full table-auto text-sm text-left">
+        <thead class="text-green-800 border-b">
+          <tr>
+            <th class="p-4">Menu</th>
+            <th class="p-4">Kategori</th>
+            <th class="p-4">Jenis</th> <!-- ✅ Tambahkan ini -->
+            <th class="p-4">Harga</th>
+            <th class="p-4">Stok</th>
+            <th class="p-4">Rating</th>
+            <th class="p-4 text-center">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% menu.forEach(item => { %>
+          <tr class="hover:bg-green-50 border-b">
+            <td class="flex items-center gap-4 p-4">
+              <img src="<%= item.gambar_url %>" alt="<%= item.nama_makanan %>" class="w-12 h-12 rounded object-cover" />
+              <div>
+                <p class="font-semibold"><%= item.nama_makanan %></p>
+                <p class="text-xs text-gray-500"><%= item.deskripsi %></p>
+              </div>
+            </td>
+            <td class="p-4"><%= item.kategori %></td>
+             <td class="p-4"><%= item.jenis %></td> <!-- ✅ Tambahkan ini -->
+            <td class="p-4">Rp<%= item.harga.toLocaleString() %></td>
+            <td class="p-4"><%= item.stok %></td>
+            <td class="p-4">⭐ <%= item.rating %></td>
+            <td class="p-4">
+              <div class="flex justify-center gap-2">
+                <a href="/penjual/editmenu/<%= item.menu_id %>" 
+                   class="inline-flex items-center justify-center w-8 h-8 text-white bg-blue-600 hover:bg-blue-700 rounded transition"
+                   title="Edit">
+                  <i class="fa-solid fa-pen"></i>
+                </a>
+                <form action="/penjual/hapusmenu/<%= item.menu_id %>" method="POST" 
+                      onsubmit="return confirm('Yakin ingin menghapus menu ini?')" 
+                      class="inline-block">
+                  <button type="submit" 
+                          class="inline-flex items-center justify-center w-8 h-8 text-white bg-red-600 hover:bg-red-700 rounded transition"
+                          title="Hapus">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>

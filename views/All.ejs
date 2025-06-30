@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pencarian Makanan UNAND</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <%- include('partials/headersearch') %>
+  
+  <!-- Konten -->
+  <main class="mx-8 my-6 space-y-8">
+
+    <!-- All Tab -->
+    <div id="tab-all" class="tab-content bg-white shadow rounded-md p-6">
+      <h2 class="font-semibold text-lg mb-4">Menampilkan 20 hasil</h2>
+      <div class="grid grid-cols-2 gap-6">
+        <div class="border rounded-md shadow p-4">
+          <img src="https://via.placeholder.com/150" class="w-full h-32 object-cover rounded-md mb-2">
+          <h3 class="font-bold text-sm">Chicken Katsu</h3>
+          <p class="text-sm text-gray-600">Rp 15.000</p>
+          <p class="text-sm text-gray-500">⭐ 4.8 (4)</p>
+        </div>
+        <div class="border rounded-md shadow p-4">
+          <img src="https://via.placeholder.com/150" class="w-full h-32 object-cover rounded-md mb-2">
+          <h3 class="font-bold text-sm">Batagor</h3>
+          <p class="text-sm text-gray-600">Rp 8.000</p>
+          <p class="text-sm text-gray-500">⭐ 4.4 (4)</p>
+        </div>
+      </div>
+    </div>
+
+      <!-- JS Tab Switcher -->
+  <script>
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('bg-green-700', 'text-white');
+        btn.classList.add('bg-white', 'text-black');
+      });
+
+      event.target.classList.add('bg-green-700', 'text-white');
+      event.target.classList.remove('bg-white', 'text-black');
+    }
+  </script>
+</body>
+</html>

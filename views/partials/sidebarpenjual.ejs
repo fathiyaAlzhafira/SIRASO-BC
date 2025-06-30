@@ -1,0 +1,45 @@
+<!-- Sidebar -->
+<aside class="w-1/5 bg-green-900 text-white flex flex-col p-6 space-y-6">
+  <h1 class="text-lg font-semibold">Dashboard Penjual</h1>
+  <nav class="flex flex-col space-y-2 flex-grow">
+    <a href="/penjual/dashboard"
+       class="<%= 'flex items-center space-x-2 p-2 rounded transition ' + 
+        (activePage === 'dashboard' ? 'bg-white text-green-900' : 'hover:bg-green-800') %>">
+      <i class="<%= 'fas fa-home ' + (activePage === 'dashboard' ? 'text-green-900' : 'text-white') %>"></i>
+      <span>Dashboard</span>
+    </a>
+    
+    <a href="/penjual/kelolamenu"
+       class="<%= 'flex items-center space-x-2 p-2 rounded transition ' + 
+        (activePage === 'kelolamenu' ? 'bg-white text-green-900' : 'hover:bg-green-800') %>">
+      <i class="<%= 'fas fa-utensils ' + (activePage === 'kelolamenu' ? 'text-green-900' : 'text-white') %>"></i>
+      <span>Kelola Menu</span>
+    </a>
+
+    <a href="/penjual/pesanan"
+       class="<%= 'flex items-center space-x-2 p-2 rounded transition ' + 
+        (activePage === 'pesanan' ? 'bg-white text-green-900' : 'hover:bg-green-800') %>">
+      <i class="<%= 'fas fa-receipt ' + (activePage === 'pesanan' ? 'text-green-900' : 'text-white') %>"></i>
+      <span>Pesanan</span>
+    </a>
+
+    <a href="/penjual/laporan"
+   class="<%= 'flex items-center space-x-2 p-2 rounded transition ' + 
+    (activePage === 'laporan' ? 'bg-white text-green-900' : 'hover:bg-green-800') %>">
+  <i class="<%= 'fas fa-chart-bar ' + (activePage === 'laporan' ? 'text-green-900' : 'text-white') %>"></i>
+  <span>Laporan</span>
+</a>
+    
+    <a href="#" class="flex items-center space-x-2 hover:bg-green-800 p-2 rounded transition">
+      <i class="fas fa-cog"></i><span>Setting</span>
+    </a>
+  </nav>
+  
+  <!-- Logout Button -->
+  <form action="/penjual/logout" method="POST" class="mt-auto">
+    <button type="submit" class="w-full flex items-center space-x-2 hover:bg-red-700 p-2 rounded transition text-red-200 hover:text-white">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </button>
+  </form>
+</aside>

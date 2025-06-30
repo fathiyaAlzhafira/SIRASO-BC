@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model discounts {
+  discount_id       Int      @id @default(autoincrement())
+  kode_diskon       String   @unique(map: "Discounts_kode_diskon_key")
+  persentase_diskon Float
+  masa_berlaku      DateTime
+  min_pembelian     Float
+  is_active         Boolean  @default(true)
+}
+
+model keranjang {
+  keranjang_id      Int      @id @default(autoincrement())
+  user_id           Int
+  menu_id           Int
+  jumlah            Int
+  waktu_pengambilan DateTime
+  menu              menu     @relation(fields: [menu_id], references: [menu_id], map: "Keranjang_menu_id_fkey")
+  user              user     @relation(fields: [user_id], references: [user_id], map: "Keranjang_user_id_fkey")
+
+  @@index([menu_id], map: "Keranjang_menu_id_fkey")
+  @@index([user_id], map: "Keranjang_user_id_fkey")
+}
+
+model menu {
+  menu_id      Int         @id @default(autoincrement())
+  nama_makanan String
+  deskripsi    String
+  kategori     String
+  jenis        String
+  harga        Int
+  stok         Int
+  gambar_url   String
+  available    Boolean
+  toko_id      Int
+  bahan        String
+  rating       Float
+  keranjang    keranjang[]
+  toko         toko        @relation(fields: [toko_id], references: [toko_id], map: "Menu_toko_id_fkey")
+  review       review[]
+  transaction_items transaction_items[]
+
+  @@index([toko_id], map: "Menu_toko_id_fkey")
+}
+
+model pickupschedule {
+  pickup_id          Int          @id @default(autoincrement())
+  transaction_id     Int          @unique(map: "PickupSchedule_transaction_id_key")
+  waktu_pengambilan  DateTime
+  waktu_estimasi     DateTime     // estimasi waktu pesanan siap
+  status_pengambilan Boolean
+  nomor_antrian      Int
+  transactions       transactions @relation(fields: [transaction_id], references: [transaction_id], map: "PickupSchedule_transaction_id_key")
+}
+
+model refundrequests {
+  refund_id         Int          @id @default(autoincrement())
+  user_id           Int
+  transaction_id    Int
+  nomor_rekening    String
+  nama_bank         String
+  alasan            String
+  bukti             String
+  status            String       @default("Pending")
+  tanggal_pengajuan DateTime     @default(now())
+  transactions      transactions @relation(fields: [transaction_id], references: [transaction_id], map: "RefundRequests_transaction_id_fkey")
+  user              user         @relation(fields: [user_id], references: [user_id], map: "RefundRequests_user_id_fkey")
+
+  @@index([transaction_id], map: "RefundRequests_transaction_id_fkey")
+  @@index([user_id], map: "RefundRequests_user_id_fkey")
+}
+
+model review {
+  review_id    Int      @id @default(autoincrement())
+  user_id      Int
+  menu_id      Int
+  rating       Int
+  komentar     String
+  tanggal_ulas DateTime @default(now())
+  menu         menu     @relation(fields: [menu_id], references: [menu_id], map: "Review_menu_id_fkey")
+  user         user     @relation(fields: [user_id], references: [user_id], map: "Review_user_id_fkey")
+
+  @@index([menu_id], map: "Review_menu_id_fkey")
+  @@index([user_id], map: "Review_user_id_fkey")
+}
+
+model salesreports {
+  report_id               Int      @id @default(autoincrement())
+  admin_id                Int
+  tanggal_awal            DateTime
+  tanggal_akhir           DateTime
+  total_pendapatan        Float
+  total_pesanan           Int
+  total_pengembalian_dana Float
+}
+
+model seller {
+  seller_id Int    @id @default(autoincrement())
+  username  String @unique(map: "Seller_username_key")
+  password  String
+  toko_id   Int    @unique(map: "Seller_toko_id_key")
+  toko      toko   @relation(fields: [toko_id], references: [toko_id], map: "Seller_toko_id_fkey")
+}
+
+model toko {
+  toko_id   Int     @id @default(autoincrement())
+  nama_toko String  @unique(map: "Toko_nama_toko_key")
+  alamat    String
+  menu      menu[]
+  seller    seller?
+}
+
+model transaction_items {
+  item_id        Int      @id @default(autoincrement())
+  transaction_id Int
+  menu_id        Int
+  jumlah         Int
+  harga_satuan   Int
+  subtotal       Int
+  transactions   transactions @relation(fields: [transaction_id], references: [transaction_id], map: "TransactionItems_transaction_id_fkey")
+  menu           menu       @relation(fields: [menu_id], references: [menu_id], map: "TransactionItems_menu_id_fkey")
+
+  @@index([transaction_id], map: "TransactionItems_transaction_id_fkey")
+  @@index([menu_id], map: "TransactionItems_menu_id_fkey")
+}
+
+model transactions {
+  transaction_id       Int              @id @default(autoincrement())
+  user_id              Int
+  total_price          Float
+  metode_pembayaran    String
+  status_pembayaran    String
+  kode_diskon          String?
+  tanggal_transaksi    DateTime         @default(now())
+  bukti_pembayaran     String?
+  riwayat_pengembalian String?
+  status               String           @default("Menunggu")
+  pickupschedule       pickupschedule?
+  refundrequests       refundrequests[]
+  transaction_items    transaction_items[]
+  user                 user             @relation(fields: [user_id], references: [user_id], map: "Transactions_user_id_fkey")
+
+  @@index([user_id], map: "Transactions_user_id_fkey")
+}
+
+model user {
+  user_id        Int              @id @default(autoincrement())
+  fullname       String
+  username       String           @unique(map: "User_username_key")
+  phone          String
+  password       String
+  status         String
+  alamat         String
+  email          String           @unique(map: "User_email_key")
+  keranjang      keranjang[]
+  refundrequests refundrequests[]
+  review         review[]
+  transactions   transactions[]
+}

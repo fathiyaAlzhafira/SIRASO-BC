@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Edit Menu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-green-50 min-h-screen flex items-center justify-center px-4 py-8">
+
+  <div class="bg-white w-full max-w-2xl rounded-lg shadow-lg p-6">
+    <h2 class="text-xl font-bold text-green-800 mb-4">Edit Menu</h2>
+
+    <form action="/penjual/editmenu/<%= menu.menu_id %>" method="POST" class="space-y-4">
+      <input type="hidden" name="id" value="<%= menu.menu_id %>">
+      
+      <div>
+        <label>Nama Menu</label>
+        <input type="text" name="nama_makanan" value="<%= menu.nama_makanan %>" required class="w-full border rounded px-3 py-2" />
+      </div>
+
+      <div>
+        <label>Kategori</label>
+        <select name="kategori" required class="w-full border rounded px-3 py-2">
+          <option value="Makanan" <%= menu.kategori === 'Makanan' ? 'selected' : '' %>>Makanan</option>
+          <option value="Minuman" <%= menu.kategori === 'Minuman' ? 'selected' : '' %>>Minuman</option>
+           <option value="nasi" <%= menu.kategori === 'nasi' ? 'selected' : '' %>>nasi</option>
+  <option value="lauk" <%= menu.kategori === 'lauk' ? 'selected' : '' %>>lauk</option>
+  <option value="gorengan" <%= menu.kategori === 'gorengan' ? 'selected' : '' %>>gorengan</option>
+  <option value="Mie" <%= menu.kategori === 'Mie' ? 'selected' : '' %>>Mie</option>
+  <option value="sup" <%= menu.kategori === 'sup' ? 'selected' : '' %>>sup</option>
+  <option value="snack" <%= menu.kategori === 'snack' ? 'selected' : '' %>>snack</option>
+  <option value="sandwich" <%= menu.kategori === 'sandwich' ? 'selected' : '' %>>sandwich</option>
+        </select>
+      </div>
+
+      <div>
+  <label>Jenis</label>
+  <select name="jenis" required class="w-full border rounded px-3 py-2">
+    <option value="Pedas" <%= menu.jenis === 'Pedas' ? 'selected' : '' %>>Pedas</option>
+    <option value="Manis" <%= menu.jenis === 'Manis' ? 'selected' : '' %>>Manis</option>
+    <option value="Asin" <%= menu.jenis === 'Asin' ? 'selected' : '' %>>Asin</option>
+    <option value="Gurih" <%= menu.jenis === 'Gurih' ? 'selected' : '' %>>Gurih</option>
+    <option value="Sehat" <%= menu.jenis === 'Sehat' ? 'selected' : '' %>>Sehat</option>
+    <option value="Berkuah" <%= menu.jenis === 'Berkuah' ? 'selected' : '' %>>Berkuah</option>
+    <option value="Ringan" <%= menu.jenis === 'Ringan' ? 'selected' : '' %>>Ringan</option>
+  </select>
+</div>
+
+      <div>
+        <label>Deskripsi</label>
+        <input type="text" name="deskripsi" value="<%= menu.deskripsi %>" required class="w-full border rounded px-3 py-2" />
+      </div>
+
+      <div>
+        <label>Harga</label>
+        <input type="number" name="harga" value="<%= menu.harga %>" required class="w-full border rounded px-3 py-2" />
+      </div>
+
+      <div>
+        <label>Stok</label>
+        <input type="number" name="stok" value="<%= menu.stok %>" required class="w-full border rounded px-3 py-2" />
+      </div>
+
+      <div>
+        <label>Gambar (URL)</label>
+        <input type="text" name="gambar_url" value="<%= menu.gambar_url %>" required class="w-full border rounded px-3 py-2" />
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <a href="/penjual/kelolamenu" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">Batal</a>
+        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Simpan Perubahan</button>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>

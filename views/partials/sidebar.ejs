@@ -1,0 +1,19 @@
+<div class="w-full lg:w-1/10 p-4 bg-white shadow-md rounded-lg border border-gray-200">
+  <h3 class="font-semibold text-xl mb-4 text-center text-green-700 border-b pb-2">Daftar Cafe</h3>
+  <ul class="space-y-3">
+    <% if (tokos && tokos.length > 0) { %>
+      <% tokos.forEach(toko => { %>
+        <li>
+          <a href="#" class="cafe-link block px-4 py-2 rounded-md transition-all hover:bg-green-50 hover:text-green-700 border-l-4 border-transparent hover:border-green-500"
+             data-cafe-id="<%= toko.toko_id %>" data-cafe-name="<%= toko.nama_toko %>">
+            <%= toko.nama_toko %>
+          </a>
+        </li>
+      <% }); %>
+    <% } else { %>
+      <li>
+        <p class="text-gray-500">Tidak ada cafe tersedia.</p>
+      </li>
+    <% } %>
+  </ul>
+</div>

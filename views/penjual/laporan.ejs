@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Laporan Penjualan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex min-h-screen bg-white">
+
+<!-- Sidebar -->
+<%- include('../partials/sidebarpenjual', { activePage: 'laporan' }) %>
+
+<!-- Main Content -->
+<main class="flex-1 bg-gradient-to-b from-green-100 to-white p-10">
+  <h2 class="text-3xl font-bold text-green-900 mb-6">Laporan</h2>
+
+  <div class="bg-green-100 rounded-xl p-6 shadow-md">
+    <div class="flex justify-between items-center border-b py-3">
+      <span class="text-lg font-medium text-gray-800">Laporan Pendapatan Harian</span>
+      <a href="/penjual/laporan/harian" class="bg-green-800 hover:bg-green-700 text-white px-4 py-1 rounded-full">Unduh</a>
+    </div>
+    <div class="flex justify-between items-center py-3">
+      <span class="text-lg font-medium text-gray-800">Laporan Pendapatan Bulanan</span>
+      <a href="/penjual/laporan/bulanan" class="bg-green-800 hover:bg-green-700 text-white px-4 py-1 rounded-full">Unduh</a>
+    </div>
+  </div>
+</main>
+</body>
+</html>

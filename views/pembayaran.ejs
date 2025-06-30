@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pembayaran</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Tambahan CSS untuk memastikan footer selalu di bawah */
+    html, body {
+      height: 100%;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+    main {
+      flex: 1 0 auto;
+    }
+    footer {
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body class="bg-white font-sans flex flex-col min-h-screen">
+
+  <!-- Header -->
+  <%- include('partials/header') %>
+
+  <!-- Konten Utama - menggunakan main tag untuk struktur yang lebih semantik -->
+  <main class="flex-grow">
+    <!-- Card Pembayaran -->
+    <div class="max-w-2xl mx-auto mt-10 mb-10 bg-white shadow-md rounded-lg border">
+      <div class="bg-green-700 text-white text-center py-2 rounded-t-lg font-semibold">
+        PEMBAYARAN
+      </div>
+      
+      <div class="p-6">
+        <!-- Ringkasan Pesanan -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold mb-3">Ringkasan Pesanan:</h3>
+          <div class="bg-gray-50 rounded-lg p-4">
+            <% if (items && items.length > 0) { %>
+              <% items.forEach(item => { %>
+                <div class="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
+                  <div>
+                    <span class="font-medium"><%= item.menu.nama_makanan %></span>
+                    <span class="text-gray-600 text-sm ml-2">x<%= item.jumlah %></span>
+                  </div>
+                  <span class="font-semibold">Rp <%= item.subtotal.toLocaleString('id-ID') %></span>
+                </div>
+              <% }) %>
+              <div class="flex justify-between items-center py-2 mt-3 pt-3 border-t border-gray-300">
+                <span class="font-bold text-lg">Total:</span>
+                <span class="font-bold text-lg text-green-700">Rp <%= totalPrice.toLocaleString('id-ID') %></span>
+              </div>
+            <% } else { %>
+              <p class="text-gray-600">Tidak ada data pesanan</p>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Informasi Pengambilan -->
+        <% if (transaksi.pickupschedule) { %>
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">Informasi Pengambilan:</h3>
+            <div class="bg-blue-50 rounded-lg p-4">
+              <div class="flex justify-between items-center mb-2">
+                <span class="font-medium">Nomor Antrian:</span>
+                <span class="font-bold text-blue-700 text-xl">#<%= transaksi.pickupschedule.nomor_antrian %></span>
+              </div>
+              <div class="text-sm text-gray-700">
+                <p><strong>Waktu Pengambilan:</strong> <%= new Date(transaksi.pickupschedule.waktu_pengambilan).toLocaleString('id-ID') %></p>
+                <p><strong>Estimasi Siap:</strong> <%= new Date(transaksi.pickupschedule.waktu_estimasi).toLocaleString('id-ID') %></p>
+                <p><strong>Status:</strong> 
+                  <% if (transaksi.pickupschedule.status_pengambilan) { %>
+                    <span class="text-green-600 font-semibold">Siap Diambil</span>
+                  <% } else { %>
+                    <span class="text-yellow-600 font-semibold">Sedang Diproses</span>
+                  <% } %>
+                </p>
+              </div>
+            </div>
+          </div>
+        <% } %>
+
+        <form action="/pembayaran/<%= transaksi.transaction_id %>" method="POST" class="space-y-4">
+          <!-- Metode Pembayaran -->
+          <div>
+            <p class="font-medium mb-2">Pilih metode pembayaran:</p>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <label class="flex items-center p-3 border rounded-lg cursor-pointer w-full sm:w-1/2 transition hover:border-green-600">
+                <input type="radio" name="metode_pembayaran" value="Transfer BNI" class="form-radio h-5 w-5 text-green-600" required>
+                <span class="ml-3 font-semibold">Transfer melalui BNI</span>
+              </label>
+              <label class="flex items-center p-3 border rounded-lg cursor-pointer w-full sm:w-1/2 transition hover:border-green-600">
+                <input type="radio" name="metode_pembayaran" value="COD" class="form-radio h-5 w-5 text-green-600">
+                <span class="ml-3 font-semibold">Bayar di Tempat (COD)</span>
+              </label>
+            </div>
+            <p class="ml-1 text-sm text-gray-600 mt-2">BNI: 172830872 (hanya untuk transfer)</p>
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex flex-col sm:flex-row justify-between gap-3 pt-4">
+            <a href="/keranjang" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 text-center">Kembali</a>
+            <button type="submit" class="bg-green-700 text-white px-4 py-2 rounded-md hover:bg-green-800 text-center">Konfirmasi Pembayaran</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <%- include('partials/footer') %>
+
+</body>
+</html>

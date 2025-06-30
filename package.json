@@ -1,0 +1,49 @@
+{
+  "name": "tb-siraso",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "setup": "node setup.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.10.1",
+    "@tailwindcss/cli": "^4.1.10",
+    "@tailwindcss/vite": "^4.1.10",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "common.js": "^1.1.1",
+    "cookie": "^1.0.2",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "dotenv": "^16.5.0",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "express-session": "^1.18.1",
+    "express-validator": "^7.2.1",
+    "http-errors": "~1.6.3",
+    "jade": "^1.11.0",
+    "morgan": "~1.9.1",
+    "multer": "^2.0.1",
+    "pdfkit": "^0.17.1"
+  },
+  "main": "app.js",
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "prisma": "^6.10.1",
+    "tailwindcss": "^4.1.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IhsanurraisPardika/TB-SIRASO.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IhsanurraisPardika/TB-SIRASO/issues"
+  },
+  "homepage": "https://github.com/IhsanurraisPardika/TB-SIRASO#readme",
+  "description": ""
+}

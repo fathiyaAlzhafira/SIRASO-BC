@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home - SIRASO BC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    main {
+      flex: 1;
+    }
+    .menu-item {
+      transition: transform 0.2s ease-in-out;
+    }
+    .menu-item:hover {
+      transform: translateY(-5px);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+
+  <!-- Header -->
+  <%- include('partials/header') %>
+
+  <main class="container mx-auto px-4 py-6">
+    <!-- Advertisement Banner -->
+    <div class="mb-8 rounded-lg overflow-hidden shadow-md">
+      <img src="/images/bc.jpg" alt="Business Center UNAND" class="w-full h-48 object-cover">
+    </div>
+
+    <!-- Search Section -->
+    <div class="mb-6 bg-white p-4 rounded-lg shadow-md border border-gray-200">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">🔍 Cari Menu Favorit Anda</h3>
+          <p class="text-gray-600 text-sm">Temukan menu berdasarkan nama, kategori, harga, atau rating</p>
+        </div>
+        <a href="/pencarian" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition flex items-center">
+          <i class="fas fa-search mr-2"></i>
+          Pencarian Lanjutan
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex flex-col lg:flex-row gap-6">
+      <!-- Sidebar -->
+      <div class="lg:w-1/5">
+        <%- include('partials/sidebar') %>
+      </div>
+
+      <!-- Menu Section -->
+      <div class="lg:w-4/5">
+        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-green-700">Daftar Menu</h2>
+            <div class="flex space-x-2">
+              <button class="category-filter px-4 py-2 bg-green-600 text-white rounded-full" data-category="all">Semua</button>
+              <button class="category-filter px-4 py-2 bg-gray-200 rounded-full" data-category="makanan">Makanan</button>
+              <button class="category-filter px-4 py-2 bg-gray-200 rounded-full" data-category="minuman">Minuman</button>
+              <button class="category-filter px-4 py-2 bg-gray-200 rounded-full" data-category="camilan">Camilan</button>
+            </div>
+          </div>
+
+          <!-- Loading Indicator -->
+          <div id="loadingIndicator" class="text-center py-8 hidden">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-600"></div>
+            <p class="mt-2 text-gray-600">Memuat menu...</p>
+          </div>
+
+          <!-- Menu Grid -->
+          <div id="menuGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Konten menu akan diisi dengan AJAX -->
+            <div class="text-center py-10">
+              <p class="text-gray-500">Silakan pilih cafe dari menu sebelah</p>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div id="emptyState" class="text-center py-10 hidden">
+            <p class="text-gray-500">Tidak ada menu yang tersedia untuk cafe ini.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+
+  <!-- Order Modal -->
+  <div id="orderModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+      <h3 class="text-xl font-semibold mb-4" id="modalMenuTitle">Pesan Menu</h3>
+      <form id="orderForm">
+        <input type="hidden" id="menuId">
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">Jumlah:</label>
+          <input type="number" id="quantity" min="1" value="1" class="w-full px-3 py-2 border rounded-md">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 mb-2">Catatan (opsional):</label>
+          <textarea id="notes" class="w-full px-3 py-2 border rounded-md" rows="2"></textarea>
+        </div>
+        <div class="flex justify-end space-x-3">
+          <button type="button" id="cancelOrder" class="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400">Batal</button>
+          <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Tambahkan ke Keranjang</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Variabel untuk menyimpan data cafe dan menu saat ini
+      let currentCafe = null;
+      let currentCategory = 'all';
+
+      // Event listener untuk filter kategori
+      document.querySelectorAll('.category-filter').forEach(button => {
+        button.addEventListener('click', function() {
+          currentCategory = this.dataset.category;
+          
+          // Update tampilan tombol aktif
+          document.querySelectorAll('.category-filter').forEach(btn => {
+            btn.classList.remove('bg-green-600', 'text-white');
+            btn.classList.add('bg-gray-200');
+          });
+          this.classList.remove('bg-gray-200');
+          this.classList.add('bg-green-600', 'text-white');
+          
+          // Filter menu berdasarkan kategori
+          if (currentCafe) {
+            loadMenu(currentCafe);
+          }
+        });
+      });
+
+      // Event listener untuk cafe link
+      document.querySelectorAll('.cafe-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const cafeId = this.dataset.cafeId;
+          const cafeName = this.dataset.cafeName;
+          
+          // Set cafe aktif
+          document.querySelectorAll('.cafe-link').forEach(lnk => {
+            lnk.classList.remove('bg-green-100', 'border-green-500');
+          });
+          this.classList.add('bg-green-100', 'border-green-500');
+          
+          currentCafe = { id: cafeId, name: cafeName };
+          loadMenu(currentCafe);
+        });
+      });
+
+      // Fungsi untuk memuat menu
+      function loadMenu(cafe) {
+        const menuGrid = document.getElementById('menuGrid');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const emptyState = document.getElementById('emptyState');
+        
+        menuGrid.innerHTML = '';
+        loadingIndicator.classList.remove('hidden');
+        emptyState.classList.add('hidden');
+        
+        fetch(`/api/menus?toko_id=${cafe.id}&category=${currentCategory}`)
+          .then(response => response.json())
+          .then(data => {
+            loadingIndicator.classList.add('hidden');
+            
+            if (data.length > 0) {
+              data.forEach(menu => {
+                const menuItem = document.createElement('div');
+                menuItem.className = 'bg-white rounded-lg shadow-md overflow-hidden menu-item hover:shadow-lg';
+                
+                menuItem.innerHTML = `
+                  <div class="relative">
+                    <img src="${menu.gambar_url || '/images/default-food.jpg'}" 
+                         alt="${menu.nama_makanan}" 
+                         class="w-full h-48 object-cover">
+                    ${menu.stok < 1 ? 
+                      '<span class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">Habis</span>' : ''}
+                  </div>
+                  <div class="p-4">
+                    <h3 class="font-semibold text-lg truncate">${menu.nama_makanan}</h3>
+                    <p class="text-green-600 font-bold">Rp ${parseInt(menu.harga).toLocaleString('id-ID')}</p>
+                    <p class="text-gray-500 text-sm mt-1 truncate">${menu.deskripsi || 'Tidak ada deskripsi'}</p>
+                    <div class="flex justify-between mt-4">
+                      <a href="/order/detail/${menu.menu_id}" class="detail-btn px-3 py-1 bg-gray-200 rounded text-sm hover:bg-gray-300">
+                        Detail
+                      </a>
+                      <button class="order-btn px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 
+                                    ${menu.stok < 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                              data-id="${menu.menu_id}" 
+                              data-name="${menu.nama_makanan}"
+                              ${menu.stok < 1 ? 'disabled' : ''}>
+                        + Keranjang
+                      </button>
+                    </div>
+                  </div>
+                `;
+                
+                menuGrid.appendChild(menuItem);
+              });
+            } else {
+              emptyState.classList.remove('hidden');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            loadingIndicator.classList.add('hidden');
+            menuGrid.innerHTML = `
+              <div class="col-span-full text-center py-10">
+                <p class="text-red-500">Terjadi kesalahan saat memuat menu. Silakan coba lagi.</p>
+              </div>
+            `;
+          });
+      }
+
+      // Event delegation untuk tombol pesan
+      document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('order-btn')) {
+          const menuId = e.target.dataset.id;
+          const menuName = e.target.dataset.name;
+          
+          // Add to cart directly
+          addToCart(menuId, 1, menuName);
+        }
+      });
+
+      // Modal handlers (can be removed if not used for ordering)
+      // ...
+
+      function addToCart(menuId, quantity, menuName) {
+        fetch('/keranjang/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            menu_id: menuId,
+            jumlah: quantity,
+          }),
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(`'${menuName}' berhasil ditambahkan ke keranjang!`);
+            // Optionally, update a cart icon/counter here
+          } else {
+            alert('Gagal menambahkan ke keranjang: ' + (data.message || 'Terjadi kesalahan'));
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat memproses permintaan');
+        });
+      }
+    });
+  </script>
+</body>
+</html>

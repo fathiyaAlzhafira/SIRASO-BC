@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Download Menu - SIRASO BC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <%- include('partials/headersearch') %>
+
+  <!-- Konten -->
+  <main class="mx-8 my-6 space-y-8">
+
+    <!-- Download -->
+    <div id="tab-download" class="tab-content bg-white shadow rounded-md p-6">
+      <h2 class="text-green-800 text-xl font-semibold mb-6 text-center">📥 Download Menu per Warung</h2>
+
+      <!-- Loading -->
+      <div id="loading" class="hidden text-center py-8">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700 mx-auto"></div>
+        <p class="mt-4 text-gray-600">Memuat daftar warung...</p>
+      </div>
+
+      <!-- Content -->
+      <div id="content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Warung list will be loaded here -->
+      </div>
+
+      <!-- No Data -->
+      <div id="noData" class="hidden text-center py-8">
+        <i class="fas fa-store text-4xl text-gray-400 mb-4"></i>
+        <p class="text-gray-600">Tidak ada warung yang tersedia</p>
+      </div>
+
+      <!-- Error -->
+      <div id="error" class="hidden text-center py-8">
+        <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+        <p class="text-red-600">Terjadi kesalahan saat memuat data</p>
+        <button onclick="loadWarung()" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
+          Coba Lagi
+        </button>
+      </div>
+    </div>
+
+    <!-- JS Tab Switcher -->
+    <script>
+      function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+        document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+        document.querySelectorAll('.tab-button').forEach(btn => {
+          btn.classList.remove('bg-green-700', 'text-white');
+          btn.classList.add('bg-white', 'text-black');
+        });
+
+        event.target.classList.add('bg-green-700', 'text-white');
+        event.target.classList.remove('bg-white', 'text-black');
+      }
+
+      function loadWarung() {
+        showLoading();
+        
+        fetch('/menu/warung')
+          .then(res => res.json())
+          .then(data => {
+            hideLoading();
+            if (data.success && data.data.length > 0) {
+              displayWarung(data.data);
+            } else {
+              showNoData();
+            }
+          })
+          .catch(err => {
+            console.error('Error:', err);
+            hideLoading();
+            showError();
+          });
+      }
+
+      function displayWarung(warung) {
+        const contentDiv = document.getElementById('content');
+        hideNoData();
+        hideError();
+        
+        const warungHtml = warung.map(item => `
+          <div class="bg-gradient-to-b from-green-100 to-white rounded-xl shadow-md p-4 flex flex-col justify-between items-center">
+            <div class="w-full h-24 rounded-lg bg-gradient-to-b from-green-200 to-white mb-4 flex items-center justify-center">
+              <i class="fas fa-store text-3xl text-green-600"></i>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-800 mb-2 text-center">${item.nama_toko}</h4>
+            <p class="text-sm text-gray-600 mb-3 text-center">${item.alamat}</p>
+            <p class="text-xs text-gray-500 mb-4">${item.menu.length} menu tersedia</p>
+            <button onclick="downloadMenuPDF(${item.toko_id}, '${item.nama_toko}')" 
+                    class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-full shadow transition flex items-center">
+              <i class="fas fa-download mr-2"></i>Download Menu
+            </button>
+          </div>
+        `).join('');
+        
+        contentDiv.innerHTML = warungHtml;
+      }
+
+      function downloadMenuPDF(tokoId, namaToko) {
+        // Tampilkan loading
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Membuat PDF...';
+        button.disabled = true;
+        
+        // Download PDF
+        const link = document.createElement('a');
+        link.href = `/menu/pdf/${tokoId}`;
+        link.download = `menu_${namaToko.replace(/\s+/g, '_')}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Reset button setelah 2 detik
+        setTimeout(() => {
+          button.innerHTML = originalText;
+          button.disabled = false;
+        }, 2000);
+      }
+
+      function showLoading() {
+        document.getElementById('loading').classList.remove('hidden');
+        document.getElementById('content').classList.add('hidden');
+        document.getElementById('noData').classList.add('hidden');
+        document.getElementById('error').classList.add('hidden');
+      }
+
+      function hideLoading() {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('content').classList.remove('hidden');
+      }
+
+      function showNoData() {
+        document.getElementById('noData').classList.remove('hidden');
+        document.getElementById('content').classList.add('hidden');
+      }
+
+      function hideNoData() {
+        document.getElementById('noData').classList.add('hidden');
+      }
+
+      function showError() {
+        document.getElementById('error').classList.remove('hidden');
+        document.getElementById('content').classList.add('hidden');
+      }
+
+      function hideError() {
+        document.getElementById('error').classList.add('hidden');
+      }
+
+      // Load warung on page load
+      document.addEventListener('DOMContentLoaded', () => {
+        loadWarung();
+      });
+    </script>
+  </main>
+</body>
+</html>
+

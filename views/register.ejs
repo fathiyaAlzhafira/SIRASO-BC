@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up - SIRASO BC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white font-sans text-gray-900">
+
+  <div class="flex h-screen">
+    <!-- Left Side (Gambar & Teks Overlay) -->
+    <div class="w-1/2 relative">
+      <!-- Gambar Background -->
+      <img src="/images/bc1.jpg" alt="BC UNAND" class="w-full h-full object-cover">
+
+      <!-- Tulisan di tengah gambar -->
+      <div class="absolute inset-0 flex items-center justify-start pl-10">
+        <div class="text-white">
+          <h1 class="text-6xl font-bold">Sign Up!</h1>
+          <h2 class="text-3xl font-semibold mt-2">SIRASO BC</h2>
+          <p class="mt-4 text-lg leading-relaxed">Sistem Informasi Pemesanan Makanan<br>di Bussiness Centre UNAND</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side -->
+    <div class="w-1/2 p-10 flex items-center justify-center">
+      <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+        <img class="w-16 h-16 mx-auto mb-4" src="/images/logo_unand.png" alt="Logo UNAND">
+
+        <h2 class="text-2xl font-bold mb-4">Sign Up</h2>
+
+        <!-- Form to Register User -->
+        <form action="/users/register" method="POST" class="space-y-4">
+          <!-- Full Name and Username -->
+          <div class="space-y-2">
+            <div class="relative">
+              <input type="text" name="fullname" placeholder="Full name" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            <div class="relative">
+              <input type="text" name="username" placeholder="Username" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+          </div>
+
+          <!-- Phone Number and Password -->
+          <div class="space-y-2">
+            <div class="relative">
+              <input type="text" name="phone" placeholder="No. Telepon" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            <div class="relative">
+              <input type="password" name="password" placeholder="Password" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+          </div>
+
+          <!-- Status Dropdown -->
+          <div class="relative">
+            <select name="status" id="status" required class="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500">
+              <option value="" disabled selected>Status</option>
+              <option value="mahasiswa" class="text-black">Mahasiswa</option>
+              <option value="penjual" class="text-black">Penjual</option>
+            </select>
+          </div>
+
+          <!-- Address -->
+          <div class="relative">
+            <input type="text" name="alamat" placeholder="Alamat" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
+
+          <!-- Email -->
+          <div class="relative">
+            <input type="email" name="email" placeholder="Email" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
+
+          <!-- Checkbox -->
+          <div class="flex items-center">
+            <input type="checkbox" required class="mr-2">
+            <span class="text-sm">Data sudah benar?</span>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="w-full py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300"><a href="/users/login"></a>Sign Up</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ringkasan Pembayaran</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+
+  <!-- Header -->
+    <%- include('partials/header') %> <!-- Menggunakan partial header.ejs -->
+
+  <!-- Container -->
+  <div class="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow-lg border border-gray-200">
+    <h2 class="text-2xl font-semibold mb-6 text-center text-green-700">Ringkasan Pembayaran</h2>
+
+    <% if (pesanan.length === 0) { %>
+      <% if (typeof transaksiTerbaru !== 'undefined' && transaksiTerbaru) { %>
+        <!-- Tampilkan konfirmasi pembayaran berhasil -->
+        <div class="text-center">
+          <p class="text-green-600 text-lg mb-4">✅ Pembayaran Berhasil!</p>
+          <p class="text-gray-600 text-sm mb-6">
+            Pesanan Anda telah berhasil diproses. Silakan tunjukkan bukti pembayaran saat mengambil pesanan.
+          </p>
+          
+          <!-- Detail Transaksi -->
+          <div class="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+            <h3 class="font-semibold mb-3">Detail Transaksi:</h3>
+            <p class="text-sm"><strong>ID Transaksi:</strong> #<%= transaksiTerbaru.transaction_id %></p>
+            <p class="text-sm"><strong>Metode Pembayaran:</strong> <%= transaksiTerbaru.metode_pembayaran %></p>
+            <p class="text-sm"><strong>Total:</strong> Rp <%= transaksiTerbaru.total_price.toLocaleString('id-ID') %></p>
+            <p class="text-sm"><strong>Tanggal:</strong> <%= new Date(transaksiTerbaru.tanggal_transaksi).toLocaleString('id-ID') %></p>
+          </div>
+
+          <div class="space-y-3">
+            <a href="/transaksi/pesanan/<%= transaksiTerbaru.transaction_id %>" class="block bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition duration-300">
+              Lihat Detail Pesanan
+            </a>
+            <a href="/transaksi/pesanan/<%= transaksiTerbaru.transaction_id %>/cetak" class="block bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition duration-300">
+              Cetak Bukti
+            </a>
+            <a href="/home" class="block bg-green-700 text-white px-6 py-2 rounded-full hover:bg-green-800 transition duration-300">
+              Kembali ke Menu
+            </a>
+          </div>
+        </div>
+      <% } else { %>
+        <!-- Tampilkan pesan keranjang kosong -->
+        <div class="text-center">
+          <p class="text-red-600 text-sm mb-4">
+            ⚠️ Tidak ada data pesanan ditemukan.
+          </p>
+          <a href="/home" class="bg-green-700 text-white px-6 py-2 rounded-full hover:bg-green-800 transition duration-300">
+            Kembali ke Menu
+          </a>
+        </div>
+      <% } %>
+    <% } else { %>
+
+      <p class="mb-4 font-medium text-lg">Pesanan Anda:</p>
+
+      <table class="w-full border text-left mb-4">
+        <thead class="bg-green-700 text-white">
+          <tr>
+            <th class="px-4 py-2 text-center">Nama Barang</th>
+            <th class="px-4 py-2 text-center">Jumlah</th>
+            <th class="px-4 py-2 text-center">Harga</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% pesanan.forEach(item => { %>
+            <tr class="border-t">
+              <td class="px-4 py-2 text-center"><%= item.nama_makanan %></td>
+              <td class="px-4 py-2 text-center"><%= item.jumlah %></td>
+              <td class="px-4 py-2 text-center">Rp <%= item.subtotal.toLocaleString('id-ID') %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+
+      <p class="text-sm text-gray-600 mt-1">
+        <strong>Metode Pembayaran:</strong>
+        <span class="text-green-600"><%= metodePembayaran || 'Belum dipilih' %></span>
+      </p>
+
+      <p class="mt-4 font-bold text-lg text-green-700">
+        Total Pembayaran: Rp <%= total.toLocaleString('id-ID') %>
+      </p>
+
+      <!-- Pilihan Waktu Pengambilan -->
+      <div class="mt-4">
+        <label for="waktuPengambilan" class="block font-medium mb-2">Pilih Waktu Pengambilan:</label>
+        <input type="datetime-local" id="waktuPengambilan" name="waktuPengambilan" 
+               class="w-full border rounded-md px-3 py-2" required>
+        <p class="text-sm text-gray-600 mt-1">Pilih waktu yang diinginkan untuk mengambil pesanan</p>
+      </div>
+
+      <!-- Pilihan Metode Pembayaran -->
+      <div class="mt-4">
+        <label class="block font-medium mb-2">Pilih Metode Pembayaran:</label>
+        <label class="flex items-center space-x-2 mb-1">
+          <input type="radio" name="metodePembayaran" value="Transfer BNI">
+          <span>Transfer melalui BNI</span>
+        </label>
+        <p class="ml-6 text-sm text-gray-600">BNI: 172830872</p>
+        <label class="flex items-center space-x-2 mt-2">
+          <input type="radio" name="metodePembayaran" value="COD">
+          <span>Bayar di Tempat (COD)</span>
+        </label>
+      </div>
+
+      <!-- Tombol Aksi -->
+      <div class="flex justify-between mt-6">
+        <a href="/keranjang" class="bg-red-500 text-white px-6 py-2 rounded-full hover:bg-red-600 transition duration-300">Kembali</a>
+        <button onclick="handlePembayaran()" class="bg-green-700 text-white px-6 py-2 rounded-full hover:bg-green-800 transition duration-300">
+          Lanjut ke Pembayaran
+        </button>
+      </div>
+
+    <% } %>
+  </div>
+
+  <!-- SweetAlert Script -->
+  <script>
+    function handlePembayaran() {
+      const waktuPengambilan = document.getElementById('waktuPengambilan').value;
+      const metodePembayaran = document.querySelector('input[name=metodePembayaran]:checked');
+      
+      if (!waktuPengambilan) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Silakan pilih waktu pengambilan',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+        return;
+      }
+      if (!metodePembayaran) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Silakan pilih metode pembayaran',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+        return;
+      }
+
+      // Buat transaksi terlebih dahulu
+      fetch('/order/create-transaction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ waktuPengambilan, metodePembayaran: metodePembayaran.value })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          // Redirect ke halaman pembayaran dengan ID transaksi
+          window.location.href = `/pembayaran/${data.transactionId}`;
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: data.message || 'Terjadi kesalahan saat membuat transaksi',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Error:', err);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Terjadi kesalahan saat memproses pembayaran',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      });
+    }
+
+    // Set default waktu pengambilan (1 jam dari sekarang)
+    document.addEventListener('DOMContentLoaded', function() {
+      const now = new Date();
+      now.setHours(now.getHours() + 1);
+      const waktuInput = document.getElementById('waktuPengambilan');
+      if (waktuInput) {
+        waktuInput.value = now.toISOString().slice(0, 16);
+      }
+    });
+  </script>
+
+<!--FOOTER-->
+  <footer class="bg-green-600 text-white p-4 mt-8 w-full text-center">
+    <p>© 2025 SIRASO BC - Universitas Andalas</p>
+  </footer>
+
+
+</body>
+</html>

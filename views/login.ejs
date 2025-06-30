@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - SIRASO BC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white font-sans text-gray-900">
+
+  <div class="flex h-screen">
+    <!-- Left Side (Gambar & Teks Overlay) -->
+    <div class="w-1/2 relative">
+      <!-- Gambar Background -->
+      <img src="/images/bc1.jpg" alt="BC UNAND" class="w-full h-full object-cover">
+
+      <!-- Tulisan di tengah gambar -->
+      <div class="absolute inset-0 flex items-center justify-start pl-10">
+        <div class="text-white">
+          <h1 class="text-6xl font-bold">Welcome!</h1>
+          <h2 class="text-3xl font-semibold mt-2">SIRASO BC</h2>
+          <p class="mt-4 text-lg leading-relaxed">Sistem Informasi Pemesanan Makanan<br>di Bussiness Centre UNAND</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side (Form Login) -->
+    <div class="w-1/2 p-10 flex items-center justify-center">
+      <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+        <img src="/images/logo_unand.png" alt="Logo" class="w-16 h-16 mx-auto mb-4">
+
+        <h2 class="text-2xl font-bold mb-4 text-center">Log in</h2>
+
+        <form action="/login" method="POST">
+          <!-- Email -->
+          <div class="mb-4">
+            <input type="text" name="email" placeholder="email" required
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
+
+          <!-- Password -->
+          <div class="mb-4">
+            <input type="password" name="password" placeholder="password" required
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
+
+          <!-- Options -->
+          <div class="flex justify-between mb-6 text-sm">
+            <label class="flex items-center">
+              <input type="checkbox" name="remember" class="mr-2"> Remember me?
+            </label>
+            <a href="#" class="text-green-600 hover:underline">Forgot password?</a>
+          </div>
+
+          <!-- Login Button -->
+          <button type="submit"
+            class="w-full py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300">
+            Log in
+          </button>
+
+          <p class="mt-4 text-center text-sm text-gray-600">
+  <span class="text-gray-500">Login sebagai penjual?</span>
+  <a href="/penjual/login" class="text-green-600 hover:underline">Klik di sini</a>
+</p>
+
+          <!-- Register Link -->
+          <div class="mt-4 text-center text-sm">
+            New here? <a href="/users/register" class="text-green-600 hover:underline">Create an account</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

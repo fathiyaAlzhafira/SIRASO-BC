@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Status Pengambilan - SIRASO BC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- Header -->
+  <%- include('partials/header') %>
+
+  <!-- Container -->
+  <div class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded shadow-lg border border-gray-200">
+    <h2 class="text-2xl font-semibold mb-6 text-center text-green-700">Status Pengambilan Pesanan</h2>
+
+    <div id="statusContent">
+      <!-- Loading -->
+      <div class="text-center py-8">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700 mx-auto"></div>
+        <p class="mt-4 text-gray-600">Memuat status pengambilan...</p>
+      </div>
+    </div>
+
+    <!-- Tombol Refresh -->
+    <div class="text-center mt-6">
+      <button onclick="refreshStatus()" class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition duration-300">
+        Refresh Status
+      </button>
+      <a href="/history" class="ml-4 bg-gray-600 text-white px-6 py-2 rounded-full hover:bg-gray-700 transition duration-300">
+        Kembali ke Riwayat
+      </a>
+    </div>
+  </div>
+
+  <!--FOOTER-->
+  <footer class="bg-green-600 text-white p-4 mt-8 w-full text-center">
+    <p>© 2025 SIRASO BC - Universitas Andalas</p>
+  </footer>
+
+  <script>
+    const transactionId = new URLSearchParams(window.location.search).get('id');
+    
+    function loadStatus() {
+      if (!transactionId) {
+        document.getElementById('statusContent').innerHTML = `
+          <div class="text-center py-8">
+            <p class="text-red-600">ID Transaksi tidak ditemukan</p>
+          </div>
+        `;
+        return;
+      }
+
+      fetch(`/order/status-pengambilan/${transactionId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            displayStatus(data.data);
+          } else {
+            document.getElementById('statusContent').innerHTML = `
+              <div class="text-center py-8">
+                <p class="text-red-600">${data.message}</p>
+              </div>
+            `;
+          }
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          document.getElementById('statusContent').innerHTML = `
+            <div class="text-center py-8">
+              <p class="text-red-600">Terjadi kesalahan saat memuat status</p>
+            </div>
+          `;
+        });
+    }
+
+    function displayStatus(data) {
+      const statusHtml = `
+        <div class="space-y-6">
+          <!-- Nomor Antrian -->
+          <div class="bg-blue-50 rounded-lg p-6 text-center">
+            <h3 class="text-lg font-semibold text-blue-800 mb-2">Nomor Antrian Anda</h3>
+            <div class="text-4xl font-bold text-blue-700">#${data.nomorAntrian}</div>
+            <p class="text-sm text-blue-600 mt-2">Tunjukkan nomor ini saat mengambil pesanan</p>
+          </div>
+
+          <!-- Status Pengambilan -->
+          <div class="bg-gray-50 rounded-lg p-6">
+            <h3 class="text-lg font-semibold mb-4">Status Pesanan</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <span class="font-medium">Status:</span>
+                <span class="font-semibold ${data.statusPengambilan ? 'text-green-600' : 'text-yellow-600'}">
+                  ${data.statusPengambilan ? '✅ Siap Diambil' : '⏳ Sedang Diproses'}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium">Waktu Pengambilan:</span>
+                <span>${new Date(data.waktuPengambilan).toLocaleString('id-ID')}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-medium">Estimasi Siap:</span>
+                <span>${new Date(data.waktuEstimasi).toLocaleString('id-ID')}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detail Pesanan -->
+          <div class="bg-gray-50 rounded-lg p-6">
+            <h3 class="text-lg font-semibold mb-4">Detail Pesanan</h3>
+            <div class="space-y-2">
+              ${data.transaksi.transaction_items.map(item => `
+                <div class="flex justify-between">
+                  <span>${item.menu.nama_makanan} x${item.jumlah}</span>
+                  <span>Rp ${item.subtotal.toLocaleString('id-ID')}</span>
+                </div>
+              `).join('')}
+              <hr class="my-2">
+              <div class="flex justify-between font-bold">
+                <span>Total:</span>
+                <span>Rp ${data.transaksi.total_price.toLocaleString('id-ID')}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Informasi Pengambilan -->
+          <div class="bg-yellow-50 rounded-lg p-6">
+            <h3 class="text-lg font-semibold mb-4 text-yellow-800">Informasi Pengambilan</h3>
+            <div class="space-y-2 text-sm">
+              <p><strong>Lokasi:</strong> Kantin SIRASO BC, Universitas Andalas</p>
+              <p><strong>Waktu Operasional:</strong> 08:00 - 22:00 WIB</p>
+              <p><strong>Catatan:</strong> Tunjukkan bukti pembayaran dan nomor antrian saat mengambil pesanan</p>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('statusContent').innerHTML = statusHtml;
+    }
+
+    function refreshStatus() {
+      loadStatus();
+      Swal.fire({
+        title: 'Status Diperbarui!',
+        text: 'Status pengambilan telah diperbarui',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      });
+    }
+
+    // Auto refresh setiap 30 detik
+    setInterval(loadStatus, 30000);
+
+    // Load status saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', loadStatus);
+  </script>
+
+</body>
+</html> 

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pesanan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body class="flex min-h-screen bg-white">
+
+
+<!-- Sidebar -->
+<%- include('../partials/sidebarpenjual', { activePage: activePage }) %>
+
+<!-- Main Content -->
+<main class="flex-1 bg-gradient-to-b from-green-100 to-white p-10">
+  <h2 class="text-3xl font-bold mb-4">Pesanan - <span class="text-lg text-gray-600">Kelola semua pesanan yang masuk</span></h2>
+
+  <div class="overflow-x-auto">
+    <table class="w-full border border-gray-300 rounded bg-white shadow">
+      <thead>
+        <tr class="bg-green-200 text-left">
+          <th class="p-3">ID & Waktu</th>
+          <th class="p-3">Pelanggan</th>
+          <th class="p-3">Pesanan</th>
+          <th class="p-3">Total</th>
+          <th class="p-3">Status</th>
+          <th class="p-3">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% transaksi.forEach(trx => { %>
+          <tr class="border-t hover:bg-green-50">
+            <td class="p-3 text-sm">
+              #<%= trx.transaction_id %><br>
+              <%= new Date(trx.tanggal_transaksi).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %>
+            </td>
+            <td class="p-3 text-sm">
+              <%= trx.user.fullname %><br>
+              <%= trx.user.phone %>
+            </td>
+            <td class="p-3 text-sm">
+  <% trx.pesananMenu.forEach(item => { %>
+    <%= item.menu.nama_makanan %> - <%= item.jumlah %>x (Rp <%= item.subtotal.toLocaleString('id-ID') %>)<br>
+  <% }) %>
+</td>
+            <td class="p-3 text-sm">
+              Rp. <%= trx.total_price.toLocaleString('id-ID') %>
+            </td>
+            <td class="p-3">
+              <% if (trx.status === 'Siap') { %>
+                <span class="text-green-700 font-semibold">Siap</span>
+              <% } else if (trx.status === 'Dibatalkan') { %>
+                <span class="text-red-600 font-semibold">Dibatalkan</span>
+              <% } else { %>
+                <span class="text-yellow-600 font-semibold">Menunggu</span>
+              <% } %>
+            </td>
+            <td class="p-3 space-y-1">
+              <% if (trx.status === 'Menunggu') { %>
+                <button onclick="setPesananSiap(<%= trx.transaction_id %>)" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                  Siap
+                </button>
+                <button onclick="batalkanPesanan(<%= trx.transaction_id %>)" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">
+                  Batalkan
+                </button>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+  function setPesananSiap(transactionId) {
+    if (confirm('Apakah Anda yakin pesanan sudah siap?')) {
+      fetch(`/penjual/pesanan/${transactionId}/siap`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('Pesanan berhasil disiapkan!');
+          location.reload();
+        } else {
+          alert('Gagal menyiapkan pesanan: ' + data.message);
+        }
+      })
+      .catch(err => {
+        console.error('Error:', err);
+        alert('Terjadi kesalahan saat menyiapkan pesanan');
+      });
+    }
+  }
+
+  function batalkanPesanan(transactionId) {
+    if (confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) {
+      fetch(`/penjual/pesanan/${transactionId}/batal`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('Pesanan berhasil dibatalkan!');
+          location.reload();
+        } else {
+          alert('Gagal membatalkan pesanan: ' + data.message);
+        }
+      })
+      .catch(err => {
+        console.error('Error:', err);
+        alert('Terjadi kesalahan saat membatalkan pesanan');
+      });
+    }
+  }
+</script>
+
+</body>
+</html>

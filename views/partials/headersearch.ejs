@@ -1,0 +1,80 @@
+<!-- Header -->
+<header class="bg-green-800 text-white px-6 py-4 flex justify-between items-center">
+  <h1 class="text-lg font-bold">Pemesanan Makanan di Business Center UNAND</h1>
+  <nav>
+    <a href="/home" class="mr-4 hover:underline">Home</a>
+    <a href="#" class="hover:underline">About</a>
+  </nav>
+</header>
+
+<!-- Search bar -->
+<section class="bg-white shadow-md rounded-md mx-8 mt-6 p-4">
+  <input
+    type="text"
+    placeholder="Cari makan, warung, atau menu favorit..."
+    class="w-full p-3 border border-gray-300 rounded-md"
+  />
+
+  <% if (typeof currentTab === 'undefined') { currentTab = ''; } %>
+
+  <!-- Tabs Navigation -->
+  <div class="flex flex-wrap gap-4 mt-4 justify-center">
+    <a href="/all"
+       class="tab-button px-6 py-2 rounded-full shadow font-medium transition duration-200 border
+              <%= currentTab === 'all' ? 'bg-green-700 text-white border-green-700' : 'bg-white text-gray-800 border-gray-300 hover:bg-green-100' %>">
+      🧾 All
+    </a>
+
+    <a href="/kategori"
+       class="tab-button px-6 py-2 rounded-full shadow font-medium transition duration-200 border
+              <%= currentTab === 'kategori' ? 'bg-green-700 text-white border-green-700' : 'bg-white text-gray-800 border-gray-300 hover:bg-green-100' %>">
+      🍽️ Kategori Makanan
+    </a>
+
+    <a href="/jenis"
+       class="tab-button px-6 py-2 rounded-full shadow font-medium transition duration-200 border
+              <%= currentTab === 'jenis' ? 'bg-green-700 text-white border-green-700' : 'bg-white text-gray-800 border-gray-300 hover:bg-green-100' %>">
+      🍴 Jenis Makanan
+    </a>
+
+    <a href="/rentang_harga"
+       class="tab-button px-6 py-2 rounded-full shadow font-medium transition duration-200 border
+              <%= currentTab === 'rentang_harga' ? 'bg-green-700 text-white border-green-700' : 'bg-white text-gray-800 border-gray-300 hover:bg-green-100' %>">
+      💸 Rentang Harga
+    </a>
+
+    <a href="/rating"
+       class="tab-button px-6 py-2 rounded-full shadow font-medium transition duration-200 border
+              <%= currentTab === 'rating' ? 'bg-green-700 text-white border-green-700' : 'bg-white text-gray-800 border-gray-300 hover:bg-green-100' %>">
+      ⭐ Rating
+    </a>
+
+    <a href="/populer"
+       class="tab-button px-6 py-2 rounded-full shadow font-medium transition duration-200 border
+              <%= currentTab === 'populer' ? 'bg-green-700 text-white border-green-700' : 'bg-white text-gray-800 border-gray-300 hover:bg-green-100' %>">
+      🔥 Populer
+    </a>
+
+    <a href="/download_menu"
+       class="tab-button px-6 py-2 rounded-full shadow font-medium transition duration-200 border
+              <%= currentTab === 'download_menu' ? 'bg-green-700 text-white border-green-700' : 'bg-white text-gray-800 border-gray-300 hover:bg-green-100' %>">
+      📥 Download Menu
+    </a>
+  </div>
+</section>
+
+<!-- Script untuk mengatur tab aktif (optional jika pakai klik tanpa reload) -->
+<script>
+  // Hanya digunakan jika kamu ingin ganti tab tanpa reload halaman
+  function setActiveTab(button) {
+    const allTabs = document.querySelectorAll('.tab-button');
+
+    allTabs.forEach(btn => {
+      btn.classList.remove('bg-green-700', 'text-white', 'border-green-700');
+      btn.classList.add('bg-white', 'text-gray-800', 'border-gray-300');
+    });
+
+    button.classList.add('bg-green-700', 'text-white', 'border-green-700');
+    button.classList.remove('bg-white', 'text-gray-800', 'border-gray-300');
+  }
+</script>
